@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Subreddit Vibe Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">◎</span>
+      <div class="brand-text">
+        <h1>The Subreddit Vibe Check</h1>
+        <p class="brand-sub">A mood reading, straight from the front page.</p>
+      </div>
+    </div>
+    <div class="signal-dot" id="signalDot" data-state="idle">
+      <span class="dot"></span>
+      <span class="signal-label" id="signalLabel">Awaiting scan</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="console" aria-label="Scan a subreddit">
+    <form id="scanForm" class="console-form" autocomplete="off">
+      <label for="subredditInput" class="console-label">r /</label>
+      <input
+        type="text"
+        id="subredditInput"
+        class="console-input"
+        placeholder="askreddit"
+        aria-label="Subreddit name"
+        spellcheck="false"
+      >
+      <button type="submit" class="scan-btn" id="scanBtn">
+        <span>Take the pulse</span>
+      </button>
+    </form>
+    <div class="console-presets" id="presets">
+      <span class="presets-label">Try:</span>
+      <button type="button" class="preset-chip" data-sub="askreddit">askreddit</button>
+      <button type="button" class="preset-chip" data-sub="wallstreetbets">wallstreetbets</button>
+      <button type="button" class="preset-chip" data-sub="aww">aww</button>
+      <button type="button" class="preset-chip" data-sub="technology">technology</button>
+      <button type="button" class="preset-chip" data-sub="nba">nba</button>
+       <button type="button" class="preset-chip" data-sub="worldnews">worldnews</button>
+  <button type="button" class="preset-chip" data-sub="gaming">gaming</button>
+  <button type="button" class="preset-chip" data-sub="movies">movies</button>
+  <button type="button" class="preset-chip" data-sub="science">science</button>
+  <button type="button" class="preset-chip" data-sub="funny">funny</button>
+    </div>
+    <p class="console-error" id="errorMsg" role="alert" hidden></p>
+  </section>
+
+  <section class="reading" id="readingSection" hidden>
+
+    <div class="reading-grid">
+
+      <div class="gauge-card">
+        <h2 class="card-eyebrow">Overall reading — r/<span id="gaugeSub">—</span></h2>
+        <div class="gauge-wrap">
+          <svg viewBox="0 0 300 170" class="gauge-svg" id="gaugeSvg" aria-hidden="true">
+            <defs>
+              <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#E85D4E"/>
+                <stop offset="50%" stop-color="#E8B95D"/>
+                <stop offset="100%" stop-color="#6BCB77"/>
+              </linearGradient>
+            </defs>
+            <path d="M 30 160 A 120 120 0 0 1 270 160" fill="none" stroke="#2A2D33" stroke-width="22" stroke-linecap="round"/>
+            <path d="M 30 160 A 120 120 0 0 1 270 160" fill="none" stroke="url(#gaugeGradient)" stroke-width="22" stroke-linecap="round" opacity="0.9"/>
+            <g id="needle" transform="rotate(-90 150 160)">
+              <line x1="150" y1="160" x2="150" y2="55" stroke="#E8E6DE" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="150" cy="160" r="9" fill="#E8E6DE"/>
+              <circle cx="150" cy="160" r="4" fill="#14161A"/>
+            </g>
+          </svg>
+          <div class="gauge-readout">
+            <span class="gauge-score" id="gaugeScore">0.0</span>
+            <span class="gauge-mood" id="gaugeMood">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <h2 class="card-eyebrow">Breakdown</h2>
+        <ul class="stat-list">
+          <li class="stat-row" data-tone="positive">
+            <span class="stat-label">Upbeat</span>
+            <span class="stat-bar"><span class="stat-fill" id="fillPos"></span></span>
+            <span class="stat-num" id="countPos">0</span>
+          </li>
+          <li class="stat-row" data-tone="neutral">
+            <span class="stat-label">Even-keeled</span>
+            <span class="stat-bar"><span class="stat-fill" id="fillNeu"></span></span>
+            <span class="stat-num" id="countNeu">0</span>
+          </li>
+          <li class="stat-row" data-tone="negative">
+            <span class="stat-label">Salty</span>
+            <span class="stat-bar"><span class="stat-fill" id="fillNeg"></span></span>
+            <span class="stat-num" id="countNeg">0</span>
+          </li>
+        </ul>
+        <div class="extremes">
+          <div class="extreme-block">
+            <p class="extreme-label pos">Sunniest headline</p>
+            <p class="extreme-title" id="bestTitle">—</p>
+          </div>
+          <div class="extreme-block">
+            <p class="extreme-label neg">Stormiest headline</p>
+            <p class="extreme-title" id="worstTitle">—</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="feed-card">
+      <div class="feed-head">
+        <h2 class="card-eyebrow">All 50 readings</h2>
+        <div class="feed-filters" id="feedFilters">
+          <button type="button" class="filter-chip is-active" data-filter="all">All</button>
+          <button type="button" class="filter-chip" data-filter="positive">Upbeat</button>
+          <button type="button" class="filter-chip" data-filter="neutral">Even</button>
+          <button type="button" class="filter-chip" data-filter="negative">Salty</button>
+        </div>
+      </div>
+      <ol class="feed-list" id="feedList"></ol>
+    </div>
+
+  </section>
+
+  <section class="loading" id="loadingSection" hidden>
+    <div class="pulse-loader" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <p id="loadingText">Reading the room in r/<span id="loadingSub"></span>…</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Titles only, scored on your device. Nothing is sent anywhere but Reddit's own API.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
